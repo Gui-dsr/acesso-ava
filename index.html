@@ -1,39 +1,33 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Redirecionando...</title>
-</head>
+<head><title>Redirecionando...</title></head>
 <body>
-    <p>Acessando Ambiente Virtual... Aguarde.</p>
+    <p>Acessando o Ambiente Virtual... Aguarde.</p>
     <script>
-        async function redirecionar() {
-            const params = new URLSearchParams(window.location.search);
-            // Pega o CPF da URL, aceitando ?cpf= ou ?<cpf>=
-            let cpf = params.get('cpf') || params.get('<cpf>');
+        const params = new URLSearchParams(window.location.search);
+        // Pega o CPF de qualquer lugar da URL
+        let cpf = "";
+        params.forEach((value) => {
+            if (value && value.replace(/\D/g, '').length === 11) cpf = value.replace(/\D/g, '');
+        });
 
-            if (!cpf) {
-                document.body.innerHTML = "Erro: CPF não identificado.";
-                return;
-            }
-
-            try {
-                // URL do seu Google Script (API)
-                const apiURL = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
-                
-                const response = await fetch(`${apiURL}?cpf=${cpf}`);
-                const data = await response.json();
-
+        if (cpf) {
+            // Função que o Google Script vai chamar de volta
+            window.processarRetorno = function(data) {
                 if (data.redirectUrl) {
-                    // Aqui NÃO tem sandbox. O redirecionamento funciona na hora.
                     window.location.replace(data.redirectUrl);
                 } else {
-                    document.body.innerHTML = "Erro ao obter acesso ao AVA.";
+                    alert("Erro: Aluno não localizado.");
                 }
-            } catch (e) {
-                document.body.innerHTML = "Erro de conexão.";
-            }
+            };
+
+            const script = document.createElement('script');
+            const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
+            script.src = `${apiBase}?cpf=${cpf}&callback=processarRetorno`;
+            document.body.appendChild(script);
+        } else {
+            document.body.innerHTML = "Erro: CPF não identificado.";
         }
-        redirecionar();
     </script>
 </body>
 </html>
