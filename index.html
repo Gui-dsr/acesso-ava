@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body>
+<body style="margin:0; padding:0; background:#ffffff;">
     <script>
         (function() {
-            // Pega tudo que vem depois da interrogação na URL
+            // Varre a URL inteira atrás de 11 números seguidos (o CPF)
             const query = window.location.search;
-            
-            // Procura qualquer sequência de 11 números na URL (o CPF)
             const match = query.match(/\d{11}/);
             const cpf = match ? match[0] : null;
 
             if (cpf) {
+                // Função que recebe os dados do Google e pula para o AVA
                 window.processarRetorno = function(data) {
                     if (data && data.redirectUrl) {
                         window.location.replace(data.redirectUrl);
@@ -19,9 +18,9 @@
                 };
 
                 const script = document.createElement('script');
+                // URL do seu Google Script (não mude se for essa mesma)
                 const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
                 
-                // Envia o CPF limpo para o Google
                 script.src = apiBase + '?cpf=' + cpf + '&callback=processarRetorno';
                 document.body.appendChild(script);
             }
