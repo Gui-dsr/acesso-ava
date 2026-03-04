@@ -4,27 +4,28 @@
 <body style="margin:0; padding:0; background:#ffffff;">
     <script>
         (function() {
-            // Pega a URL inteira da barra de endereços
+            // Pega a URL completa da barra de endereços
             const urlCompleta = window.location.href;
             
-            // Procura por qualquer sequência de 11 números seguidos
-            // Isso garante que QUALQUER tag (<cpf>, cpf, etc) seja descartada
+            // Procura por QUALQUER sequência de 11 números seguidos na URL
+            // Isso ignora se o sistema mandou "?cpf=", "&<cpf>=" ou qualquer outra tag
             const match = urlCompleta.match(/\d{11}/);
             const cpfLimpo = match ? match[0] : null;
 
             if (cpfLimpo) {
-                // Função que recebe o link do Google e pula para o AVA
+                // Função que recebe o link do seu Google Script e pula para o AVA
                 window.processarRetorno = function(data) {
                     if (data && data.redirectUrl) {
+                        // Faz o redirecionamento real na barra de endereços
                         window.location.replace(data.redirectUrl);
                     }
                 };
 
                 const script = document.createElement('script');
-                // URL da sua API no Google
+                // URL da sua API no Google (certifique-se de que é esta mesma)
                 const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
                 
-                // Envia para o Google APENAS os 11 números, sem tags.
+                // Manda o CPF limpo (só os 11 números) para o Google
                 script.src = apiBase + '?cpf=' + cpfLimpo + '&callback=processarRetorno';
                 document.body.appendChild(script);
             }
