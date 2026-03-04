@@ -4,14 +4,16 @@
 <body style="margin:0; padding:0; background:#ffffff;">
     <script>
         (function() {
-            // Pega a parte da URL após a interrogação (?cpf=123...)
-            const queryString = window.location.search;
+            // Pega a URL completa
+            const url = window.location.href;
             
-            // Extrai apenas os números (remove o ?cpf= ou qualquer tag)
-            const cpf = queryString.replace(/\D/g, '');
+            // Procura na URL qualquer sequência de exatamente 11 números
+            // Isso ignora "?cpf=", "&<cpf>=" e qualquer outra tag que o sistema mande
+            const match = url.match(/\d{11}/);
+            const cpfEncontrado = match ? match[0] : null;
 
-            if (cpf && cpf.length === 11) {
-                // Função que recebe o link e pula para o AVA
+            if (cpfEncontrado) {
+                // Função que o Google Script chama para abrir o AVA
                 window.processarRetorno = function(data) {
                     if (data && data.redirectUrl) {
                         window.location.replace(data.redirectUrl);
@@ -22,11 +24,9 @@
                 // URL da sua API no Google
                 const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
                 
-                // Manda o CPF para o Google processar o token
-                script.src = apiBase + '?cpf=' + cpf + '&callback=processarRetorno';
+                // Envia apenas os 11 números limpos
+                script.src = apiBase + '?cpf=' + cpfEncontrado + '&callback=processarRetorno';
                 document.body.appendChild(script);
-            } else {
-                console.error("CPF inválido ou não encontrado na URL");
             }
         })();
     </script>
