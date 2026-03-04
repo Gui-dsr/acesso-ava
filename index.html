@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head><title>Redirecionando...</title></head>
+<head><meta charset="UTF-8"></head>
 <body>
-    <p>Acessando o Ambiente Virtual... Aguarde.</p>
     <script>
-        const params = new URLSearchParams(window.location.search);
-        // Pega o CPF de qualquer lugar da URL
-        let cpf = "";
-        params.forEach((value) => {
-            if (value && value.replace(/\D/g, '').length === 11) cpf = value.replace(/\D/g, '');
-        });
+        (function() {
+            // Pega tudo que vem depois da interrogação na URL
+            const query = window.location.search;
+            
+            // Procura qualquer sequência de 11 números na URL (o CPF)
+            const match = query.match(/\d{11}/);
+            const cpf = match ? match[0] : null;
 
-        if (cpf) {
-            // Função que o Google Script vai chamar de volta
-            window.processarRetorno = function(data) {
-                if (data.redirectUrl) {
-                    window.location.replace(data.redirectUrl);
-                } else {
-                    alert("Erro: Aluno não localizado.");
-                }
-            };
+            if (cpf) {
+                window.processarRetorno = function(data) {
+                    if (data && data.redirectUrl) {
+                        window.location.replace(data.redirectUrl);
+                    }
+                };
 
-            const script = document.createElement('script');
-            const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
-            script.src = `${apiBase}?cpf=${cpf}&callback=processarRetorno`;
-            document.body.appendChild(script);
-        } else {
-            document.body.innerHTML = "Erro: CPF não identificado.";
-        }
+                const script = document.createElement('script');
+                const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
+                
+                // Envia o CPF limpo para o Google
+                script.src = apiBase + '?cpf=' + cpf + '&callback=processarRetorno';
+                document.body.appendChild(script);
+            }
+        })();
     </script>
 </body>
 </html>
