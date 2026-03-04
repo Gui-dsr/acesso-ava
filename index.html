@@ -4,13 +4,15 @@
 <body style="margin:0; padding:0; background:#ffffff;">
     <script>
         (function() {
-            // Varre a URL inteira atrás de 11 números seguidos (o CPF)
-            const query = window.location.search;
-            const match = query.match(/\d{11}/);
+            // Pega a URL completa da barra de endereços
+            const urlCompleta = window.location.href;
+            
+            // Procura por qualquer sequência de 11 números (o CPF)
+            const match = urlCompleta.match(/\d{11}/);
             const cpf = match ? match[0] : null;
 
             if (cpf) {
-                // Função que recebe os dados do Google e pula para o AVA
+                // Função que recebe o link do Google e pula para o AVA
                 window.processarRetorno = function(data) {
                     if (data && data.redirectUrl) {
                         window.location.replace(data.redirectUrl);
@@ -18,9 +20,10 @@
                 };
 
                 const script = document.createElement('script');
-                // URL do seu Google Script (não mude se for essa mesma)
+                // URL do seu Google Script (API)
                 const apiBase = 'https://script.google.com/macros/s/AKfycbJ2O6lvd7uyQfDFp4STJU-1HlBiSxCY7daGAB1TJqC3N34QQhrtzxKwM58HZn4vplw/exec';
                 
+                // Manda o CPF limpo para o Google processar o token
                 script.src = apiBase + '?cpf=' + cpf + '&callback=processarRetorno';
                 document.body.appendChild(script);
             }
